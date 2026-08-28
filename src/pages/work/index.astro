@@ -46,14 +46,16 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft))
 const grid = document.querySelector('.grid') as HTMLElement;
 const shown = document.getElementById('shown') as HTMLElement;
 const tiles = Array.from(grid.querySelectorAll('.tile')) as HTMLElement[];
+const filterKeys = Array.from(document.querySelectorAll('.filt')).map(
+  (x) => (x as HTMLElement).dataset.c!
+);
 
-document.getElementById('filters')!.addEventListener('click', (e) => {
-  const b = (e.target as HTMLElement).closest('.filt') as HTMLElement | null;
-  if (!b) return;
-  const c = b.dataset.c!;
+function applyFilter(c: string) {
+  const btn = document.querySelector(`.filt[data-c="${c}"]`) as HTMLElement | null;
+  if (!btn) return;
   document.querySelectorAll('.filt').forEach((x) => {
-    x.classList.toggle('on', x === b);
-    x.setAttribute('aria-pressed', String(x === b));
+    x.classList.toggle('on', x === btn);
+    x.setAttribute('aria-pressed', String(x === btn));
   });
   let n = 0;
   tiles.forEach((t) => {
@@ -62,6 +64,25 @@ document.getElementById('filters')!.addEventListener('click', (e) => {
     if (hit) n++;
   });
   shown.textContent = `${n} project${n === 1 ? '' : 's'}`;
+}
+
+const fromUrl = new URLSearchParams(location.search).get('cat');
+const remembered = sessionStorage.getItem('workFilter');
+const startKey =
+  fromUrl && filterKeys.includes(fromUrl) ? fromUrl :
+  remembered && filterKeys.includes(remembered) ? remembered :
+  'all';
+applyFilter(startKey);
+sessionStorage.setItem('workFilter', startKey);
+history.replaceState(null, '', startKey === 'all' ? location.pathname : `${location.pathname}?cat=${startKey}`);
+
+document.getElementById('filters')!.addEventListener('click', (e) => {
+  const b = (e.target as HTMLElement).closest('.filt') as HTMLElement | null;
+  if (!b) return;
+  const c = b.dataset.c!;
+  applyFilter(c);
+  sessionStorage.setItem('workFilter', c);
+  history.replaceState(null, '', c === 'all' ? location.pathname : `${location.pathname}?cat=${c}`);
 });
 
 tiles.forEach((t) => {

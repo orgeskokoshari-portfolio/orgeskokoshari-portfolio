@@ -22,6 +22,7 @@ const projects = defineCollection({
     draft: z.boolean().default(false),
     thumb: z.string(),
     previewLoop: z.string().optional(),
+    vimeoUrl: z.string().optional(),
     layers: z.array(layer).min(1).max(6)
   })
 });
@@ -34,6 +35,7 @@ const about = defineCollection({
     experience: z.string().optional(),
     status: z.string().optional(),
     portrait: z.string(),
+    portraitVideo: z.string().optional(),
     cv: z.string(),
     software: z.array(z.string())
   })

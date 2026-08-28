@@ -8,7 +8,6 @@ import { img } from '../lib/media';
 const entry = await getEntry('about', 'about');
 const d = entry.data;
 const { Content } = await render(entry);
-const isVideoPortrait = d.portrait.endsWith('.mp4');
 
 const disciplines = [
   { title: 'Character look-dev', body: 'Shading, texturing and lighting characters through to final render.' },
@@ -47,21 +46,20 @@ const credits = [
     <div class="about">
       <aside class="side">
         <div class="portrait" id="portrait">
-          {isVideoPortrait ? (
+          <Image
+            id="pstill"
+            src={img(d.portrait)}
+            alt="Portrait"
+            widths={[340, 560, 800]}
+            sizes="(max-width: 880px) 280px, 340px"
+            loading="eager"
+          />
+          {d.portraitVideo && (
             <video id="pvid" muted loop playsinline preload="none" aria-hidden="true">
-              <source src={d.portrait} type="video/mp4" />
+              <source src={d.portraitVideo} type="video/mp4" />
             </video>
-          ) : (
-            <Image
-              id="pstill"
-              src={img(d.portrait)}
-              alt="Portrait"
-              widths={[340, 560, 800]}
-              sizes="(max-width: 880px) 280px, 340px"
-              loading="eager"
-            />
           )}
-          {isVideoPortrait && <span class="phint" id="phint">Hover to play</span>}
+          {d.portraitVideo && <span class="phint" id="phint">Hover to play</span>}
         </div>
         <div class="who">Orges Kokoshari<em>3D &middot; VFX &middot; Look-Dev</em></div>
         <div class="facts">

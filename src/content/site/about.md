@@ -3,7 +3,8 @@ lede: One sentence on what you do and who you do it for.
 location: "—"
 experience: "— years"
 status: Freelance & staff
-portrait: pilot-thumb.jpg
+portrait: site/portrait.jpg
+portraitVideo: /media/site/portrait.mp4
 cv: /orges-kokoshari-cv.pdf
 software:
   - Maya

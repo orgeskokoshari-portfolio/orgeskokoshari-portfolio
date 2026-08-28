@@ -3,14 +3,15 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Tile from '../components/Tile.astro';
+import VideoOverlay from '../components/VideoOverlay.astro';
 
 const featured = (await getCollection('projects', ({ data }) => data.featured && !data.draft))
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 3);
 
-const REEL_LOOP = '/media/pilot-final.mp4';
+const REEL_LOOP = '/media/site/reel-loop.mp4';
 const REEL_FULL = 'https://player.vimeo.com/video/000000000';
-const REEL_POSTER = '/media/pilot-poster.jpg';
+const REEL_POSTER = '/media/site/reel-poster.jpg';
 ---
 <Base title="Orges Kokoshari — 3D / VFX">
   <Header transparent />
@@ -27,7 +28,7 @@ const REEL_POSTER = '/media/pilot-poster.jpg';
         <div class="tag">Creative 3D &amp; VFX &middot; Film, episodic, advertising</div>
       </div>
       <div>
-        <button class="play" id="playReel">&#9654;&nbsp; Play reel</button>
+        <button class="play" id="playReel" data-video-trigger="reel">&#9654;&nbsp; Play reel</button>
         <div class="reelmeta">Showreel</div>
       </div>
     </div>
@@ -67,12 +68,7 @@ const REEL_POSTER = '/media/pilot-poster.jpg';
     </section>
   </main>
 
-  <div class="ov" id="ov" role="dialog" aria-modal="true" aria-label="Showreel">
-    <button class="ovx" id="ovx" aria-label="Close reel">&#10005;</button>
-    <div class="ovframe">
-      <iframe id="vim" src="" title="Showreel" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen data-src={`${REEL_FULL}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`}></iframe>
-    </div>
-  </div>
+  <VideoOverlay id="reel" vimeoUrl={REEL_FULL} label="Showreel" />
 </Base>
 
 <style>
@@ -87,10 +83,6 @@ const REEL_POSTER = '/media/pilot-poster.jpg';
   display:flex;justify-content:space-between;align-items:flex-end;gap:26px;flex-wrap:wrap}
 .hero h1{font-size:clamp(30px,7.2vw,104px);font-variation-settings:"wdth" 120,"wght" 800;line-height:.86}
 .tag{font-family:var(--mono);font-size:clamp(9px,1.1vw,11px);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-top:14px}
-.play{display:inline-flex;align-items:center;gap:11px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--milk);border:1px solid rgba(230,231,226,.42);background:rgba(0,0,0,.35);
-  backdrop-filter:blur(6px);padding:14px 22px;cursor:pointer;transition:.25s;white-space:nowrap}
-.play:hover{border-color:var(--milk);background:rgba(230,231,226,.1)}
 .reelmeta{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);margin-top:12px;text-align:right}
 .cue{position:absolute;left:50%;bottom:0;z-index:4;width:1px;height:46px;background:linear-gradient(to bottom,transparent,var(--dim))}
 @media(prefers-reduced-motion:no-preference){.cue{animation:cue 2.6s ease-in-out infinite}}
@@ -108,17 +100,6 @@ const REEL_POSTER = '/media/pilot-poster.jpg';
 .slinks{display:flex;gap:20px;flex-wrap:wrap;margin-top:34px}
 .slinks a{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);transition:color .2s}
 .slinks a:hover{color:var(--milk)}
-
-.ov{position:fixed;inset:0;z-index:800;background:rgba(6,7,7,.96);backdrop-filter:blur(20px);
-  display:none;opacity:0;transition:opacity .35s;padding:clamp(14px,3vw,44px)}
-.ov.open{display:flex;align-items:center;justify-content:center}
-.ov.shown{opacity:1}
-.ovframe{width:100%;max-width:1500px;aspect-ratio:16/9;background:#000}
-.ovframe iframe{width:100%;height:100%;border:0}
-.ovx{position:absolute;top:clamp(12px,2.4vw,28px);right:clamp(12px,2.4vw,28px);width:40px;height:40px;
-  border:1px solid var(--line);background:none;color:var(--milk);cursor:pointer;font-size:15px;
-  display:grid;place-items:center;transition:.22s;z-index:5}
-.ovx:hover{border-color:var(--milk);rotate:90deg}
 </style>
 
 <script>
@@ -143,28 +124,13 @@ new IntersectionObserver(
   { rootMargin: '-90% 0px 0px 0px' }
 ).observe(hero);
 
-const ov = document.getElementById('ov')!;
-const vim = document.getElementById('vim') as HTMLIFrameElement;
-function openReel() {
-  ov.classList.add('open');
-  requestAnimationFrame(() => ov.classList.add('shown'));
-  document.body.classList.add('locked');
+document.addEventListener('videooverlay:open', (e) => {
+  if ((e as CustomEvent).detail.id !== 'reel') return;
   loop.pause();
-  if (!vim.src) vim.src = vim.dataset.src!;
-  (document.getElementById('ovx') as HTMLElement).focus();
-}
-function closeReel() {
-  ov.classList.remove('shown');
-  setTimeout(() => ov.classList.remove('open'), 340);
-  document.body.classList.remove('locked');
-  vim.src = '';
+});
+document.addEventListener('videooverlay:close', (e) => {
+  if ((e as CustomEvent).detail.id !== 'reel') return;
   if (!reduce) loop.play().catch(() => {});
-}
-document.getElementById('playReel')!.addEventListener('click', openReel);
-document.getElementById('ovx')!.addEventListener('click', closeReel);
-ov.addEventListener('click', (e) => { if (e.target === ov) closeReel(); });
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && ov.classList.contains('open')) closeReel();
 });
 
 document.querySelectorAll('.tile').forEach((t) => {

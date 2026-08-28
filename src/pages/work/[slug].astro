@@ -3,6 +3,8 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import LayerStack from '../../components/LayerStack.astro';
+import VideoOverlay from '../../components/VideoOverlay.astro';
+import { CATEGORIES } from '../../lib/media';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects', ({ data }) => !data.draft);
@@ -21,7 +23,7 @@ const d = project.data;
   <Header />
   <main class="wrap">
     <div class="head">
-      <a class="arrow" href="/work/">&larr; All work</a>
+      <a class="arrow" id="allWork" href="/work/" data-categories={JSON.stringify(CATEGORIES)}>&larr; All work</a>
       <h1>{d.title}</h1>
       <div class="meta">
         <div><span>Role</span><b>{d.role}</b></div>
@@ -29,6 +31,7 @@ const d = project.data;
         {d.year && <div><span>Year</span><b>{d.year}</b></div>}
         <div><span>Layers</span><b>{d.layers.length}</b></div>
       </div>
+      {d.vimeoUrl && <button class="play" data-video-trigger="project">&#9654;&nbsp; Play full video</button>}
     </div>
   </main>
 
@@ -41,6 +44,8 @@ const d = project.data;
       <a href={`/work/${next.id}/`}><b>{next.data.title} &rarr;</b></a>
     </div>
   </main>
+
+  {d.vimeoUrl && <VideoOverlay id="project" vimeoUrl={d.vimeoUrl} label={`${d.title} — Full video`} />}
 </Base>
 
 <style>
@@ -50,6 +55,7 @@ h1{margin-bottom:22px}
 .meta{display:flex;gap:26px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
 .meta span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dimmer);margin-bottom:2px}
 .meta b{font-weight:500;font-size:14px}
+.play{margin-top:22px}
 .body{padding-block:clamp(44px,7vw,90px);max-width:62ch}
 .body :global(p){color:var(--dim);margin:0 0 16px}
 .body :global(p:first-child){font-size:clamp(17px,2.1vw,21px);line-height:1.5;color:var(--milk)}
@@ -58,3 +64,14 @@ h1{margin-bottom:22px}
 .next b{font-family:var(--display);font-variation-settings:"wdth" 112,"wght" 700;font-weight:700;
   font-size:clamp(22px,4vw,44px);text-transform:uppercase;letter-spacing:-.01em}
 </style>
+
+<script>
+const allWork = document.getElementById('allWork') as HTMLAnchorElement;
+const categories = JSON.parse(allWork.dataset.categories!) as { key: string; label: string }[];
+const savedCat = sessionStorage.getItem('workFilter');
+if (savedCat && savedCat !== 'all') {
+  allWork.href = `/work/?cat=${savedCat}`;
+  const label = categories.find((c) => c.key === savedCat)?.label;
+  if (label) allWork.textContent = `← ${label}`;
+}
+</script>

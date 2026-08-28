@@ -1,0 +1,67 @@
+---
+interface Props {
+  id: string;
+  vimeoUrl: string;
+  label?: string;
+}
+const { id, vimeoUrl, label = 'Video' } = Astro.props;
+---
+<div class="ov" id={`ov-${id}`} data-overlay={id} role="dialog" aria-modal="true" aria-label={label}>
+  <button class="ovx" data-overlay-close aria-label={`Close ${label}`}>&#10005;</button>
+  <div class="ovframe">
+    <iframe
+      data-overlay-frame
+      src=""
+      title={label}
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen
+      data-src={`${vimeoUrl}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`}
+    ></iframe>
+  </div>
+</div>
+
+<style>
+.ov{position:fixed;inset:0;z-index:800;background:rgba(6,7,7,.96);backdrop-filter:blur(20px);
+  display:none;opacity:0;transition:opacity .35s;padding:clamp(14px,3vw,44px)}
+.ov.open{display:flex;align-items:center;justify-content:center}
+.ov.shown{opacity:1}
+.ovframe{width:100%;max-width:1500px;aspect-ratio:16/9;background:#000}
+.ovframe iframe{width:100%;height:100%;border:0}
+.ovx{position:absolute;top:clamp(12px,2.4vw,28px);right:clamp(12px,2.4vw,28px);width:40px;height:40px;
+  border:1px solid var(--line);background:none;color:var(--milk);cursor:pointer;font-size:15px;
+  display:grid;place-items:center;transition:.22s;z-index:5}
+.ovx:hover{border-color:var(--milk);rotate:90deg}
+</style>
+
+<script>
+document.querySelectorAll('.ov[data-overlay]').forEach((root) => {
+  const ov = root as HTMLElement;
+  const id = ov.dataset.overlay!;
+  const frame = ov.querySelector('[data-overlay-frame]') as HTMLIFrameElement;
+  const closeBtn = ov.querySelector('[data-overlay-close]') as HTMLElement;
+  const triggers = Array.from(document.querySelectorAll(`[data-video-trigger="${id}"]`));
+
+  function open() {
+    ov.classList.add('open');
+    requestAnimationFrame(() => ov.classList.add('shown'));
+    document.body.classList.add('locked');
+    if (!frame.getAttribute('src')) frame.src = frame.dataset.src!;
+    closeBtn.focus();
+    document.dispatchEvent(new CustomEvent('videooverlay:open', { detail: { id } }));
+  }
+  function close() {
+    ov.classList.remove('shown');
+    setTimeout(() => ov.classList.remove('open'), 340);
+    document.body.classList.remove('locked');
+    frame.src = '';
+    document.dispatchEvent(new CustomEvent('videooverlay:close', { detail: { id } }));
+  }
+
+  triggers.forEach((t) => t.addEventListener('click', open));
+  closeBtn.addEventListener('click', close);
+  ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && ov.classList.contains('open')) close();
+  });
+});
+</script>

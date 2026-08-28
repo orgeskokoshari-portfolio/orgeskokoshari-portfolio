@@ -6,30 +6,31 @@ year: "2020"
 order: 10
 featured: true
 draft: false
-thumb: pilot-thumb.jpg
-previewLoop: /media/pilot-final.mp4
+thumb: pilot-girl/thumb.jpg
+previewLoop: /media/pilot-girl/final.mp4
+vimeoUrl: https://player.vimeo.com/video/000000000
 layers:
   - label: Final animation
     caption: Delivered character animation with final look-dev applied.
     type: video
-    src: /media/pilot-final.mp4
-    poster: /media/pilot-poster.jpg
+    src: /media/pilot-girl/final.mp4
+    poster: /media/pilot-girl/poster.jpg
   - label: Rendering
     caption: Lighting and shading — suit leather, mesh panels, visor glass and skin.
     type: image
-    src: pilot-rendering.png
+    src: pilot-girl/rendering.png
   - label: Sculpting
     caption: High-resolution sculpt carried through to the rendered surface.
     type: image
-    src: pilot-sculpting.png
+    src: pilot-girl/sculpting.png
   - label: Design
     caption: Suit construction resolved across front, profile and back.
     type: image
-    src: pilot-design.png
+    src: pilot-girl/design.png
   - label: Illustration
     caption: Concept painting and pose exploration that set the character.
     type: image
-    src: pilot-illustration.png
+    src: pilot-girl/illustration.png
 ---
 
 Replace this with the write-up. The first paragraph renders larger than the rest,

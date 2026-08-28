@@ -18,6 +18,9 @@ collections:
     identifier_field: title
     sortable_fields: [order, title, year]
     summary: '{{title}} — {{role}}'
+    media_folder: /src/assets/media/{{slug}}
+    public_folder: /src/assets/media/{{slug}}
+    hint: 'Fill in the Title first — media you upload is filed into a folder named after it.'
     fields:
       - { name: title, label: Title, widget: string }
       - name: category
@@ -41,9 +44,14 @@ collections:
         label: Hover preview clip
         widget: file
         required: false
-        media_folder: /public/media
-        public_folder: /media
+        media_folder: /public/media/{{slug}}
+        public_folder: /media/{{slug}}
         hint: 'Optional. Short silent MP4, 3-6 seconds, keep under 500 KB.'
+      - name: vimeoUrl
+        label: Full video (Vimeo)
+        widget: string
+        required: false
+        hint: 'Vimeo player URL, e.g. https://player.vimeo.com/video/123456789. Opens in the Play full video overlay.'
       - name: layers
         label: Breakdown layers
         label_singular: Layer
@@ -64,11 +72,13 @@ collections:
           - name: src
             label: File
             widget: file
-            hint: 'Images go to src/assets/media. Videos must be short silent MP4s.'
+            hint: 'Images: pick via the file browser (filed into this project''s folder). Video layers: do NOT use the picker — type the path directly as /media/<slug>/filename.mp4, after uploading it to public/media/<slug>/ yourself. Videos must be short silent MP4s.'
           - name: poster
             label: Video poster frame
             widget: image
             required: false
+            media_folder: /public/media/{{slug}}
+            public_folder: /media/{{slug}}
             hint: 'Only for video layers. Shown before playback and when autoplay is blocked.'
       - { name: body, label: Project write-up, widget: markdown, required: false }
 
@@ -84,9 +94,16 @@ collections:
           - { name: experience, label: Years experience, widget: string, required: false }
           - { name: status, label: Availability, widget: string, required: false }
           - name: portrait
-            label: Portrait (image or clip)
+            label: Portrait (still)
+            widget: image
+            hint: '4:5 ratio. Always visible; the base photo behind the hover clip below.'
+          - name: portraitVideo
+            label: Portrait hover clip
             widget: file
-            hint: '4:5 ratio. A JPEG becomes a still; an MP4 plays on hover.'
+            required: false
+            media_folder: /public/media
+            public_folder: /media
+            hint: 'Optional. Short silent MP4, 4:5 ratio, fades in over the still on hover.'
           - { name: cv, label: CV / resume PDF, widget: file, media_folder: /public, public_folder: / }
           - name: software
             label: Software
