@@ -1,0 +1,27 @@
+---
+import { Image } from 'astro:assets';
+import { img } from '../lib/media';
+
+const { project } = Astro.props;
+const n = project.data.layers.length;
+const thumb = img(project.data.thumb);
+---
+<a class="tile" href={`/work/${project.id}/`} data-cat={project.data.category}>
+  <Image
+    src={thumb}
+    alt={project.data.title}
+    widths={[420, 640, 900]}
+    sizes="(max-width: 600px) 92vw, (max-width: 1080px) 46vw, 31vw"
+    loading="lazy"
+  />
+  {project.data.previewLoop && (
+    <video muted loop playsinline preload="none" data-src={project.data.previewLoop}></video>
+  )}
+  <div class="tmeta">
+    <div>
+      <div class="tt">{project.data.title}</div>
+      <div class="tr">{project.data.role}</div>
+    </div>
+    <div class="tlay">{n} {n === 1 ? 'layer' : 'layers'}</div>
+  </div>
+</a>

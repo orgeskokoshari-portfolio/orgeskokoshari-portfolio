@@ -1,0 +1,109 @@
+backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/kokoshari-portfolio
+  branch: main
+  base_url: https://sveltia-cms-auth.YOUR-SUBDOMAIN.workers.dev
+
+publish_mode: simple
+media_folder: src/assets/media
+public_folder: /src/assets/media
+
+collections:
+  - name: projects
+    label: Projects
+    label_singular: Project
+    folder: src/content/projects
+    create: true
+    slug: '{{slug}}'
+    identifier_field: title
+    sortable_fields: [order, title, year]
+    summary: '{{title}} — {{role}}'
+    fields:
+      - { name: title, label: Title, widget: string }
+      - name: category
+        label: Category
+        widget: select
+        options:
+          - { label: Film & Shows, value: film }
+          - { label: Advertising, value: advertising }
+          - { label: R&D / Personal, value: personal }
+      - { name: role, label: Your role, widget: string, hint: 'e.g. FX Lead, Character Look-Dev' }
+      - { name: client, label: Studio or client, widget: string, required: false }
+      - { name: year, label: Year, widget: string, required: false }
+      - { name: order, label: Sort order, widget: number, default: 50, hint: 'Lower numbers appear first' }
+      - { name: featured, label: Show on homepage, widget: boolean, default: false }
+      - { name: draft, label: Hide from site, widget: boolean, default: false }
+      - name: thumb
+        label: Grid thumbnail
+        widget: image
+        hint: '16:9 image. Used on the work grid and homepage.'
+      - name: previewLoop
+        label: Hover preview clip
+        widget: file
+        required: false
+        media_folder: /public/media
+        public_folder: /media
+        hint: 'Optional. Short silent MP4, 3-6 seconds, keep under 500 KB.'
+      - name: layers
+        label: Breakdown layers
+        label_singular: Layer
+        widget: list
+        max: 6
+        summary: '{{fields.label}}'
+        hint: 'Layer 1 is the finished piece. Maximum six.'
+        fields:
+          - { name: label, label: Layer name, widget: string, hint: 'e.g. Final comp, Sculpting, Cryptomatte' }
+          - { name: caption, label: One-line description, widget: string, required: false }
+          - name: type
+            label: Media type
+            widget: select
+            options:
+              - { label: Image, value: image }
+              - { label: Video, value: video }
+            default: image
+          - name: src
+            label: File
+            widget: file
+            hint: 'Images go to src/assets/media. Videos must be short silent MP4s.'
+          - name: poster
+            label: Video poster frame
+            widget: image
+            required: false
+            hint: 'Only for video layers. Shown before playback and when autoplay is blocked.'
+      - { name: body, label: Project write-up, widget: markdown, required: false }
+
+  - name: site
+    label: Site content
+    files:
+      - name: about
+        label: About page
+        file: src/content/site/about.md
+        fields:
+          - { name: lede, label: Opening line, widget: string }
+          - { name: location, label: Based in, widget: string, required: false }
+          - { name: experience, label: Years experience, widget: string, required: false }
+          - { name: status, label: Availability, widget: string, required: false }
+          - name: portrait
+            label: Portrait (image or clip)
+            widget: file
+            hint: '4:5 ratio. A JPEG becomes a still; an MP4 plays on hover.'
+          - { name: cv, label: CV / resume PDF, widget: file, media_folder: /public, public_folder: / }
+          - name: software
+            label: Software
+            widget: list
+            field: { name: name, label: Name, widget: string }
+          - { name: body, label: Bio, widget: markdown }
+
+      - name: reel
+        label: Showreel
+        file: src/content/site/reel.md
+        fields:
+          - { name: vimeoUrl, label: Vimeo URL, widget: string, hint: 'Full reel. Opens when Play reel is clicked.' }
+          - name: loop
+            label: Silent hero loop
+            widget: file
+            media_folder: /public/media
+            public_folder: /media
+            hint: '3-6 second silent MP4 that plays behind your name.'
+          - { name: poster, label: Poster frame, widget: image, hint: 'The most-seen image on your site. Choose it deliberately.' }
+          - { name: tagline, label: Tagline, widget: string }

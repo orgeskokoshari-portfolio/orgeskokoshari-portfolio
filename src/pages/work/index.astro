@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Tile from '../../components/Tile.astro';
+import { CATEGORIES } from '../../lib/media';
+
+const projects = (await getCollection('projects', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+<Base title="Work — Orges Kokoshari">
+  <Header />
+  <main class="wrap">
+    <div class="top">
+      <h1>Selected Work</h1>
+      <div class="filters" id="filters">
+        {CATEGORIES.map((c, i) => (
+          <button class="filt" class:list={[{ on: i === 0 }]} data-c={c.key} aria-pressed={i === 0}>
+            {c.label}
+          </button>
+        ))}
+      </div>
+    </div>
+    <div class="bar">
+      <span class="mono" id="shown">{projects.length} projects</span>
+      <span class="mono">Click any piece to open its layers</span>
+    </div>
+    <div class="grid">
+      {projects.map((p) => <Tile project={p} />)}
+    </div>
+  </main>
+</Base>
+
+<style>
+.top{padding:calc(var(--hdr) + 46px) 0 24px;display:flex;justify-content:space-between;align-items:flex-end;gap:22px;flex-wrap:wrap}
+.filters{display:flex;gap:4px;flex-wrap:wrap;padding-bottom:6px}
+.filt{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
+  background:none;border:1px solid transparent;padding:8px 13px;cursor:pointer;transition:.2s}
+.filt:hover{color:var(--dim)}
+.filt.on{color:var(--milk);border-color:var(--line)}
+.bar{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);
+  padding:14px 0 26px;gap:16px;flex-wrap:wrap}
+</style>
+
+<script>
+const grid = document.querySelector('.grid') as HTMLElement;
+const shown = document.getElementById('shown') as HTMLElement;
+const tiles = Array.from(grid.querySelectorAll('.tile')) as HTMLElement[];
+
+document.getElementById('filters')!.addEventListener('click', (e) => {
+  const b = (e.target as HTMLElement).closest('.filt') as HTMLElement | null;
+  if (!b) return;
+  const c = b.dataset.c!;
+  document.querySelectorAll('.filt').forEach((x) => {
+    x.classList.toggle('on', x === b);
+    x.setAttribute('aria-pressed', String(x === b));
+  });
+  let n = 0;
+  tiles.forEach((t) => {
+    const hit = c === 'all' || t.dataset.cat === c;
+    t.style.display = hit ? '' : 'none';
+    if (hit) n++;
+  });
+  shown.textContent = `${n} project${n === 1 ? '' : 's'}`;
+});
+
+tiles.forEach((t) => {
+  const v = t.querySelector('video') as HTMLVideoElement | null;
+  if (!v || !matchMedia('(hover: hover)').matches) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  t.addEventListener('mouseenter', () => {
+    if (!v.src) v.src = v.dataset.src!;
+    t.classList.add('playing');
+    v.play().catch(() => {});
+  });
+  t.addEventListener('mouseleave', () => { t.classList.remove('playing'); v.pause(); });
+});
+</script>

@@ -1,0 +1,287 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import { img } from '../lib/media';
+
+const entry = await getEntry('about', 'about');
+const d = entry.data;
+const { Content } = await render(entry);
+const isVideoPortrait = d.portrait.endsWith('.mp4');
+
+const disciplines = [
+  { title: 'Character look-dev', body: 'Shading, texturing and lighting characters through to final render.' },
+  { title: 'FX & simulation', body: 'Destruction, pyro, cloth and volumetrics for shot work.' },
+  { title: 'Lighting & rendering', body: 'Sequence lighting, pass delivery and comp support.' },
+  { title: 'Concept & design', body: 'Character and hard-surface design from brief to approved sheet.' }
+];
+
+const recognition = [
+  { title: 'Placeholder', body: 'Awards, features, talks or festival selections go here. Delete if empty — an empty section reads worse than no section.' }
+];
+
+const CATEGORIES = [
+  { key: 'all', label: 'All' },
+  { key: 'film', label: 'Film & Shows' },
+  { key: 'adv', label: 'Advertising' },
+  { key: 'personal', label: 'R&D / Personal' }
+];
+
+const credits = [
+  { title: 'Film Project 01', client: 'Studio name', role: 'FX Lead', cat: 'film', catLabel: 'Film', year: '—' },
+  { title: 'Film Project 02', client: 'Studio name', role: 'Lookdev', cat: 'film', catLabel: 'Film', year: '—' },
+  { title: 'Advertising Project 01', client: 'Agency name', role: 'CG Supervisor', cat: 'adv', catLabel: 'Advertising', year: '—' },
+  { title: 'Film Project 03', client: 'Studio name', role: 'Senior FX', cat: 'film', catLabel: 'Film', year: '—' },
+  { title: 'Advertising Project 02', client: 'Agency name', role: 'Full CG Build', cat: 'adv', catLabel: 'Advertising', year: '—' },
+  { title: 'Pilot Girl', client: 'Personal', role: 'Character Look-Dev', cat: 'personal', catLabel: 'R&D', year: '—' },
+  { title: 'Advertising Project 03', client: 'Agency name', role: 'Lighting', cat: 'adv', catLabel: 'Advertising', year: '—' },
+  { title: 'Film Project 04', client: 'Studio name', role: 'FX Artist', cat: 'film', catLabel: 'Film', year: '—' }
+];
+---
+<Base title="About — Orges Kokoshari" description="Orges Kokoshari. 3D, VFX and character look-dev for film, episodic and advertising.">
+  <Header />
+  <main class="wrap">
+    <div class="page-head" id="about"><h1>About</h1></div>
+
+    <div class="about">
+      <aside class="side">
+        <div class="portrait" id="portrait">
+          {isVideoPortrait ? (
+            <video id="pvid" muted loop playsinline preload="none" aria-hidden="true">
+              <source src={d.portrait} type="video/mp4" />
+            </video>
+          ) : (
+            <Image
+              id="pstill"
+              src={img(d.portrait)}
+              alt="Portrait"
+              widths={[340, 560, 800]}
+              sizes="(max-width: 880px) 280px, 340px"
+              loading="eager"
+            />
+          )}
+          {isVideoPortrait && <span class="phint" id="phint">Hover to play</span>}
+        </div>
+        <div class="who">Orges Kokoshari<em>3D &middot; VFX &middot; Look-Dev</em></div>
+        <div class="facts">
+          <div><span>Based in</span><b>{d.location || '—'}</b></div>
+          <div><span>Experience</span><b>{d.experience || '—'}</b></div>
+          <div><span>Available for</span><b>{d.status || '—'}</b></div>
+          <div><span>Remote</span><b>Yes</b></div>
+        </div>
+        <a class="dl" href={d.cv} download>Download CV <span>&darr;</span></a>
+        <div class="socials">
+          <a href="https://www.linkedin.com/in/orgeskokoshari/">LinkedIn &nearr;</a>
+          <a href="https://www.instagram.com/orges.kokoshari/">Instagram &nearr;</a>
+          <a href="https://www.youtube.com/@kokosharistudios-digital">YouTube &nearr;</a>
+          <a href="#">Vimeo &nearr;</a>
+          <a href="#">ArtStation &nearr;</a>
+        </div>
+      </aside>
+
+      <div class="bio">
+        <p class="lede">{d.lede}</p>
+        <Content />
+
+        <div class="sub">Disciplines</div>
+        <div class="disc">
+          {disciplines.map((it) => (
+            <div><b>{it.title}</b><p>{it.body}</p></div>
+          ))}
+        </div>
+
+        <div class="sub">Software</div>
+        <div class="chips">
+          {d.software.map((s) => <span class="chip">{s}</span>)}
+        </div>
+
+        <div class="sub">Recognition</div>
+        <div class="disc">
+          {recognition.map((it) => (
+            <div><b>{it.title}</b><p>{it.body}</p></div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <section id="credits">
+      <div class="sec-head">
+        <h2>Credits</h2>
+        <div class="cfilt" id="cfilt">
+          {CATEGORIES.map((c, i) => (
+            <button class:list={[{ on: i === 0 }]} data-c={c.key}>{c.label}</button>
+          ))}
+        </div>
+      </div>
+      <table class="credits" id="ctable">
+        <thead>
+          <tr><th>Title</th><th>Studio / Client</th><th>Role</th><th>Category</th><th style="text-align:right">Year</th></tr>
+        </thead>
+        <tbody>
+          {credits.map((c) => (
+            <tr data-c={c.cat}>
+              <td class="t">{c.title}</td>
+              <td>{c.client}</td>
+              <td>{c.role}</td>
+              <td><span class="cat">{c.catLabel}</span></td>
+              <td class="num">{c.year}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+
+    <section id="contact">
+      <div class="contact">
+        <div class="mono" style="margin-bottom:20px">Start here</div>
+        <a class="mail" href="mailto:kokosharstudios@gmail.com">kokosharstudios@gmail.com</a>
+        <div class="cgrid">
+          <div><span>Representation</span><b>&mdash;</b></div>
+          <div><span>Time zone</span><b>&mdash;</b></div>
+          <div><span>CV</span><a href={d.cv} download>Download PDF &darr;</a></div>
+          <div><span>Elsewhere</span><a href="https://www.linkedin.com/in/orgeskokoshari/">LinkedIn &nearr;</a></div>
+        </div>
+      </div>
+      <footer>
+        <span class="mono">&copy; <span id="yr"></span> Orges Kokoshari</span>
+        <span class="mono">About page &mdash; concept v01</span>
+      </footer>
+    </section>
+  </main>
+</Base>
+
+<style>
+.page-head{padding:calc(var(--hdr) + 54px) 0 30px}
+
+.about{display:grid;grid-template-columns:340px 1fr;gap:clamp(28px,5vw,86px);
+  border-top:1px solid var(--line);padding-top:34px}
+.side{position:sticky;top:calc(var(--hdr) + 28px);align-self:start}
+.portrait{position:relative;aspect-ratio:4/5;background:#0B0D0C;border:1px solid var(--line);overflow:hidden;margin-bottom:20px}
+.portrait :global(img),.portrait video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.portrait video{opacity:0;transition:opacity .5s ease}
+.portrait.playing video{opacity:1}
+.phint{position:absolute;left:10px;bottom:10px;z-index:3;font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--milk);border:1px solid rgba(230,231,226,.35);padding:4px 8px;
+  background:rgba(11,13,12,.6);backdrop-filter:blur(4px);transition:opacity .4s}
+.portrait.playing .phint,.portrait.auto .phint{opacity:0}
+@media(hover:none){.phint{display:none}}
+.who{font-family:var(--display);font-variation-settings:"wdth" 108,"wght" 680;font-weight:700;
+  font-size:20px;text-transform:uppercase;letter-spacing:.01em;line-height:1.1}
+.who em{display:block;font-family:var(--mono);font-style:normal;font-size:10px;letter-spacing:.15em;
+  color:var(--dim);margin-top:7px;font-weight:400}
+.facts{margin:22px 0 0;border-top:1px solid var(--line-soft)}
+.facts div{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.facts span{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer)}
+.facts b{font-weight:500;font-size:13.5px;text-align:right}
+.dl{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin-top:20px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--milk);
+  border:1px solid var(--line);padding:13px 15px;transition:.22s;background:none;cursor:pointer}
+.dl:hover{border-color:var(--milk);background:rgba(230,231,226,.04)}
+.socials{display:flex;flex-wrap:wrap;gap:0 18px;margin-top:20px}
+.socials a{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+  padding:5px 0;transition:color .2s}
+.socials a:hover{color:var(--milk)}
+
+.bio :global(p){margin:0 0 20px;max-width:64ch;color:var(--dim)}
+.bio .lede{font-size:clamp(18px,2.3vw,25px);line-height:1.45;color:var(--milk);max-width:26ch;margin-bottom:26px}
+.sub{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);
+  border-top:1px solid var(--line);padding-top:14px;margin:42px 0 18px}
+.disc div{display:grid;grid-template-columns:190px 1fr;gap:18px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.disc b{font-weight:500;font-size:14.5px}
+.disc p{margin:0;color:var(--dim);font-size:14px}
+@media(max-width:900px){
+  .disc div{grid-template-columns:1fr;gap:4px}
+}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--line);padding:7px 11px;color:var(--dim)}
+
+@media(max-width:880px){
+  .about{grid-template-columns:1fr;gap:36px}
+  .side{position:static}
+  .portrait{max-width:280px}
+}
+
+/* ---------- credits ---------- */
+#credits, #contact{padding-block:clamp(56px,8vw,110px)}
+.cfilt{display:flex;gap:3px;flex-wrap:wrap}
+.cfilt button{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--dimmer);background:none;border:1px solid transparent;padding:7px 11px;cursor:pointer;transition:.2s}
+.cfilt button:hover{color:var(--dim)}
+.cfilt button.on{color:var(--milk);border-color:var(--line)}
+
+.credits{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+.credits th{text-align:left;font-weight:400;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--dimmer);padding:16px 16px 12px 0;border-bottom:1px solid var(--line)}
+.credits td{padding:14px 16px 14px 0;border-bottom:1px solid var(--line-soft);color:var(--dim);vertical-align:top}
+.credits tr:hover td{color:var(--milk);background:rgba(230,231,226,.02)}
+.credits .t{color:var(--milk);font-family:var(--body);font-size:15px;font-weight:500;letter-spacing:0}
+.credits td.num{text-align:right;padding-right:0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cat{font-size:9px;letter-spacing:.13em;text-transform:uppercase;border:1px solid var(--line);padding:3px 7px;white-space:nowrap}
+tr.hide{display:none}
+@media(max-width:760px){
+  .credits thead{display:none}
+  .credits tr{display:grid;grid-template-columns:1fr auto;gap:3px 12px;padding:15px 0;border-bottom:1px solid var(--line-soft)}
+  .credits td{border:0;padding:0}
+  .credits td.num{text-align:right}
+}
+
+/* ---------- contact ---------- */
+.contact{border-top:1px solid var(--line);padding-top:clamp(40px,6vw,72px)}
+.mail{font-family:var(--display);font-variation-settings:"wdth" 100,"wght" 640;font-weight:600;
+  font-size:clamp(20px,4.4vw,54px);letter-spacing:-.012em;line-height:1.05;display:inline-block;
+  border-bottom:1px solid var(--line);padding-bottom:8px;transition:border-color .25s;word-break:break-word}
+.mail:hover{border-color:var(--milk)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:20px;margin-top:44px}
+.cgrid div span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dimmer);margin-bottom:6px}
+.cgrid div a,.cgrid div b{font-weight:500;font-size:14.5px}
+.cgrid div a{border-bottom:1px solid var(--line-soft)}
+.cgrid div a:hover{border-color:var(--milk)}
+footer{padding:24px 0 40px;border-top:1px solid var(--line-soft);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:70px}
+</style>
+
+<script>
+const yr = document.getElementById('yr');
+if (yr) yr.textContent = String(new Date().getFullYear());
+
+const rows = Array.from(document.querySelectorAll('#ctable tbody tr')) as HTMLElement[];
+const cfilt = document.getElementById('cfilt');
+cfilt?.addEventListener('click', (e) => {
+  const b = (e.target as HTMLElement).closest('button') as HTMLButtonElement | null;
+  if (!b) return;
+  const c = b.dataset.c!;
+  cfilt.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+  rows.forEach((r) => r.classList.toggle('hide', c !== 'all' && r.dataset.c !== c));
+});
+
+const portraitEl = document.getElementById('portrait');
+const pv = document.getElementById('pvid') as HTMLVideoElement | null;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (portraitEl && pv && !reduce) {
+  const canHover = matchMedia('(hover: hover)').matches;
+  if (canHover) {
+    portraitEl.addEventListener('mouseenter', () => {
+      if (!pv.src && pv.querySelector('source')) pv.load();
+      portraitEl.classList.add('playing');
+      pv.play().catch(() => {});
+    });
+    portraitEl.addEventListener('mouseleave', () => {
+      portraitEl.classList.remove('playing');
+      pv.pause();
+    });
+  } else {
+    portraitEl.classList.add('auto');
+    new IntersectionObserver((es) => {
+      es.forEach((en) => {
+        if (en.isIntersecting) {
+          portraitEl.classList.add('playing');
+          pv.play().catch(() => {});
+        } else {
+          pv.pause();
+        }
+      });
+    }, { threshold: 0.4 }).observe(portraitEl);
+  }
+}
+</script>

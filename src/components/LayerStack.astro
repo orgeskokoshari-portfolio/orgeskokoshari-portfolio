@@ -1,0 +1,227 @@
+---
+import { Image } from 'astro:assets';
+import { img } from '../lib/media';
+import '../styles/layer-stack.css';
+
+const { layers } = Astro.props;
+const N = layers.length;
+---
+<div class="layerstack" data-count={N}>
+  <div class="stack">
+    {layers.map((L: any, i: number) => (
+      <article class="panel" data-i={i} style={`z-index:${i + 2}`}>
+        {L.type === 'video' ? (
+          <video class="pm" muted loop playsinline preload="metadata" poster={L.poster}>
+            <source src={L.src} type="video/mp4" />
+          </video>
+        ) : (
+          <Image
+            class="pm"
+            src={img(L.src)}
+            alt={L.label}
+            widths={[640, 1000, 1500]}
+            sizes="(max-width: 900px) 96vw, 88vw"
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        )}
+        <div class="edge"></div>
+        <div class="shade"></div>
+        <div class="pcap">
+          <b>{L.label}</b>
+          {L.caption && <p>{L.caption}</p>}
+        </div>
+        <button class="grip" data-i={i} aria-label={`Open layer ${i + 1}, ${L.label}`}>
+          <span class="gline"></span><span class="gtip">{L.label}</span>
+        </button>
+      </article>
+    ))}
+  </div>
+
+  {N > 1 ? (
+    <div class="scrub">
+      <div class="track" role="slider" tabindex="0" aria-valuemin="1" aria-valuemax={N} aria-valuenow="1" aria-label="Breakdown layer">
+        <div class="railln"><i class="fill"></i></div>
+        {layers.map((L: any, i: number) => (
+          <button class="tick" class:list={[{ on: i === 0 }]} data-i={i}
+                  style={`left:${((i / (N - 1)) * 100).toFixed(4)}%`}
+                  aria-label={`Layer ${i + 1}, ${L.label}`}>
+            <span class="tmark"></span><span class="tno">{i + 1}</span><span class="ttip">{L.label}</span>
+          </button>
+        ))}
+        <div class="knob"></div>
+      </div>
+      <div class="sfoot">
+        <button class="pp" aria-label="Pause">&#9724;&#9724;</button>
+        <div class="count"><b>01</b> / {String(N).padStart(2, '0')} &nbsp;Layers</div>
+      </div>
+    </div>
+  ) : (
+    <div class="sfoot" style="padding-top:14px">
+      <button class="pp" aria-label="Pause">&#9724;&#9724;</button>
+      <div class="single">Single layer</div>
+    </div>
+  )}
+</div>
+
+<script>
+document.querySelectorAll('.layerstack').forEach((root) => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stack = root.querySelector('.stack') as HTMLElement;
+  const panels = Array.from(root.querySelectorAll('.panel')) as HTMLElement[];
+  const ticks = Array.from(root.querySelectorAll('.tick')) as HTMLElement[];
+  const track = root.querySelector('.track') as HTMLElement | null;
+  const fill = root.querySelector('.fill') as HTMLElement | null;
+  const knob = root.querySelector('.knob') as HTMLElement | null;
+  const pp = root.querySelector('.pp') as HTMLButtonElement;
+  const cnum = root.querySelector('.count b') as HTMLElement | null;
+  const N = panels.length;
+  let pos = 0, raf = 0, drag: any = null, barDrag = false, idle: any = null, touched = false;
+
+  const spine = () =>
+    parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--spine')) || 16;
+  const detent = (x: number) => {
+    x = Math.max(0, Math.min(1, x));
+    return x * x * x * (x * (x * 6 - 15) + 10);
+  };
+
+  function fit() {
+    const s = spine();
+    const host = root.parentElement as HTMLElement;
+    const cs = getComputedStyle(host);
+    const avail = host.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const maxH = window.innerHeight * 0.74;
+    const W = Math.min(avail - (N - 1) * s, (maxH * 16) / 9);
+    (root as HTMLElement).style.width = Math.round(W + (N - 1) * s) + 'px';
+    (root as HTMLElement).style.marginInline = 'auto';
+    stack.style.height = Math.round(((stack.clientWidth - (N - 1) * s) * 9) / 16) + 'px';
+  }
+
+  function layout() {
+    const S = stack.clientWidth, s = spine(), W = S - (N - 1) * s, act = Math.round(pos);
+    const d = Math.floor(pos) + detent(pos - Math.floor(pos));
+    panels.forEach((p, i) => {
+      const past = i * s, future = S - (N - i) * s;
+      const t = Math.max(0, Math.min(1, d - (i - 1)));
+      p.style.width = W + 'px';
+      p.style.left = future + (past - future) * t + 'px';
+      p.classList.toggle('active', i === act);
+      p.classList.toggle('past', i < act);
+      p.classList.toggle('future', i > act);
+      const v = p.querySelector('video') as HTMLVideoElement | null;
+      if (v) {
+        if (i === act && !reduce && !pp.dataset.paused) v.play().catch(() => {});
+        else if (i !== act) v.pause();
+      }
+    });
+    if (N > 1 && fill && knob && track && cnum) {
+      const pct = (pos / (N - 1)) * 100;
+      fill.style.width = pct + '%';
+      knob.style.left = pct + '%';
+      ticks.forEach((t, i) => t.classList.toggle('on', i === act));
+      track.setAttribute('aria-valuenow', String(act + 1));
+      cnum.textContent = String(act + 1).padStart(2, '0');
+    }
+    pp.disabled = !panels[act].querySelector('video');
+  }
+
+  function glide(target: number) {
+    cancelAnimationFrame(raf);
+    const a = pos, dist = target - a, t0 = performance.now();
+    const dur = reduce ? 1 : Math.min(2000, 360 + Math.abs(dist) * 460);
+    const step = (now: number) => {
+      const k = Math.min(1, (now - t0) / dur);
+      pos = a + dist * (0.66 * k + 0.34 * (-(Math.cos(Math.PI * k) - 1) / 2));
+      layout();
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    step(performance.now());
+  }
+  const go = (i: number) => { touched = true; glide(Math.max(0, Math.min(N - 1, i))); };
+
+  if (track) {
+    const fromX = (x: number) => {
+      const r = track.getBoundingClientRect();
+      return Math.max(0, Math.min(N - 1, ((x - r.left) / r.width) * (N - 1)));
+    };
+    track.addEventListener('pointerdown', (e: any) => {
+      if (e.target.closest('.tick')) return;
+      barDrag = true; touched = true; cancelAnimationFrame(raf);
+      track.setPointerCapture(e.pointerId); pos = fromX(e.clientX); layout();
+    });
+    track.addEventListener('pointermove', (e: any) => { if (barDrag) { pos = fromX(e.clientX); layout(); } });
+    track.addEventListener('pointerup', () => { if (barDrag) { barDrag = false; glide(Math.round(pos)); } });
+    track.addEventListener('keydown', (e: any) => {
+      if (e.key === 'ArrowRight') { go(Math.round(pos) + 1); e.preventDefault(); }
+      if (e.key === 'ArrowLeft') { go(Math.round(pos) - 1); e.preventDefault(); }
+      if (e.key === 'Home') { go(0); e.preventDefault(); }
+      if (e.key === 'End') { go(N - 1); e.preventDefault(); }
+    });
+    ticks.forEach((t) => t.addEventListener('click', () => go(Number(t.dataset.i))));
+
+    stack.addEventListener('pointerdown', (e: any) => {
+      if (e.target.closest('.grip')) return;
+      drag = { x: e.clientX, start: pos, moved: false };
+      cancelAnimationFrame(raf); stack.setPointerCapture(e.pointerId);
+    });
+    stack.addEventListener('pointermove', (e: any) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) < 7) return;
+      drag.moved = true; touched = true; stack.classList.add('grabbing');
+      pos = Math.max(0, Math.min(N - 1, drag.start - dx / (stack.clientWidth * 0.62)));
+      layout();
+    });
+    window.addEventListener('pointerup', () => {
+      if (!drag) return;
+      if (drag.moved) glide(Math.round(pos));
+      drag = null; stack.classList.remove('grabbing');
+    });
+    panels.forEach((p) => {
+      p.querySelector('.grip')!.addEventListener('click', (e) => {
+        e.stopPropagation(); go(Number(p.dataset.i));
+      });
+    });
+
+    let wheelLock = false;
+    stack.addEventListener('wheel', (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) < Math.abs(e.deltaY) || Math.abs(e.deltaX) < 12) return;
+      e.preventDefault();
+      if (wheelLock) return;
+      wheelLock = true; setTimeout(() => { wheelLock = false; }, 760);
+      go(Math.round(pos) + (e.deltaX > 0 ? 1 : -1));
+    }, { passive: false });
+  }
+
+  pp.addEventListener('click', () => {
+    const v = panels[Math.round(pos)].querySelector('video') as HTMLVideoElement | null;
+    if (!v) return;
+    if (v.paused) { v.play(); pp.innerHTML = '&#9724;&#9724;'; delete pp.dataset.paused; }
+    else { v.pause(); pp.innerHTML = '&#9654;'; pp.dataset.paused = '1'; }
+  });
+
+  ['pointermove', 'keydown', 'pointerdown'].forEach((ev) =>
+    document.addEventListener(ev, () => {
+      stack.classList.remove('idle');
+      clearTimeout(idle);
+      idle = setTimeout(() => stack.classList.add('idle'), 4500);
+    })
+  );
+
+  window.addEventListener('resize', () => { fit(); layout(); });
+  fit(); layout();
+
+  if (!reduce && knob && N > 1) {
+    setTimeout(() => {
+      if (touched) return;
+      knob.animate(
+        [{ transform: 'translateX(0)' }, { transform: 'translateX(18px)' }, { transform: 'translateX(0)' }],
+        { duration: 1500, easing: 'cubic-bezier(.3,.5,.2,1)' }
+      );
+      panels[1]?.animate(
+        [{ transform: 'translateX(0)' }, { transform: 'translateX(-14px)' }, { transform: 'translateX(0)' }],
+        { duration: 1500, easing: 'cubic-bezier(.3,.5,.2,1)' }
+      );
+    }, 1300);
+  }
+});
+</script>

@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import LayerStack from '../../components/LayerStack.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft);
+  const sorted = projects.sort((a, b) => a.data.order - b.data.order);
+  return sorted.map((p, i) => ({
+    params: { slug: p.id },
+    props: { project: p, next: sorted[(i + 1) % sorted.length] }
+  }));
+}
+
+const { project, next } = Astro.props;
+const { Content } = await render(project);
+const d = project.data;
+---
+<Base title={`${d.title} — Orges Kokoshari`} description={`${d.title}. ${d.role}.`}>
+  <Header />
+  <main class="wrap">
+    <div class="head">
+      <a class="arrow" href="/work/">&larr; All work</a>
+      <h1>{d.title}</h1>
+      <div class="meta">
+        <div><span>Role</span><b>{d.role}</b></div>
+        {d.client && <div><span>Client</span><b>{d.client}</b></div>}
+        {d.year && <div><span>Year</span><b>{d.year}</b></div>}
+        <div><span>Layers</span><b>{d.layers.length}</b></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="wrap"><LayerStack layers={d.layers} /></div>
+
+  <main class="wrap">
+    <section class="body"><Content /></section>
+    <div class="next">
+      <span class="mono">Next project</span>
+      <a href={`/work/${next.id}/`}><b>{next.data.title} &rarr;</b></a>
+    </div>
+  </main>
+</Base>
+
+<style>
+.head{padding:calc(var(--hdr) + 44px) 0 26px}
+.arrow{display:inline-block;margin-bottom:24px}
+h1{margin-bottom:22px}
+.meta{display:flex;gap:26px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
+.meta span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dimmer);margin-bottom:2px}
+.meta b{font-weight:500;font-size:14px}
+.body{padding-block:clamp(44px,7vw,90px);max-width:62ch}
+.body :global(p){color:var(--dim);margin:0 0 16px}
+.body :global(p:first-child){font-size:clamp(17px,2.1vw,21px);line-height:1.5;color:var(--milk)}
+.next{border-top:1px solid var(--line);padding:26px 0 90px;display:flex;justify-content:space-between;
+  align-items:baseline;gap:20px;flex-wrap:wrap}
+.next b{font-family:var(--display);font-variation-settings:"wdth" 112,"wght" 700;font-weight:700;
+  font-size:clamp(22px,4vw,44px);text-transform:uppercase;letter-spacing:-.01em}
+</style>
