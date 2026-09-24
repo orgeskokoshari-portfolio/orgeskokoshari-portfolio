@@ -16,6 +16,11 @@ export function img(path: string): ImageMetadata {
   return hit.default;
 }
 
+export function vimeoEmbed(url: string): string {
+  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  return match ? `https://player.vimeo.com/video/${match[1]}` : url;
+}
+
 export const CATEGORIES = [
   { key: 'all', label: 'All' },
   { key: 'film', label: 'Film & Shows' },

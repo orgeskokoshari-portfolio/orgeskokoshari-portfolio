@@ -1,10 +1,13 @@
 ---
+import { vimeoEmbed } from '../lib/media';
+
 interface Props {
   id: string;
   vimeoUrl: string;
   label?: string;
 }
 const { id, vimeoUrl, label = 'Video' } = Astro.props;
+const embedUrl = vimeoEmbed(vimeoUrl);
 ---
 <div class="ov" id={`ov-${id}`} data-overlay={id} role="dialog" aria-modal="true" aria-label={label}>
   <button class="ovx" data-overlay-close aria-label={`Close ${label}`}>&#10005;</button>
@@ -15,7 +18,7 @@ const { id, vimeoUrl, label = 'Video' } = Astro.props;
       title={label}
       allow="autoplay; fullscreen; picture-in-picture"
       allowfullscreen
-      data-src={`${vimeoUrl}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`}
+      data-src={`${embedUrl}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`}
     ></iframe>
   </div>
 </div>

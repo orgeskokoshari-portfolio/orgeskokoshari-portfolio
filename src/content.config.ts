@@ -41,4 +41,14 @@ const about = defineCollection({
   })
 });
 
-export const collections = { projects, about };
+const reel = defineCollection({
+  loader: glob({ pattern: 'reel.md', base: './src/content/site' }),
+  schema: z.object({
+    vimeoUrl: z.string(),
+    loop: z.string(),
+    poster: z.string(),
+    tagline: z.string().optional()
+  })
+});
+
+export const collections = { projects, about, reel };

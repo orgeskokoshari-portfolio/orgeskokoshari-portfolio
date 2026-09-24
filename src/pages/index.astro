@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Tile from '../components/Tile.astro';
@@ -9,9 +9,12 @@ const featured = (await getCollection('projects', ({ data }) => data.featured &&
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 3);
 
-const REEL_LOOP = '/media/site/reel-loop.mp4';
-const REEL_FULL = 'https://player.vimeo.com/video/000000000';
-const REEL_POSTER = '/media/site/reel-poster.jpg';
+const reelEntry = await getEntry('reel', 'reel');
+const reel = reelEntry.data;
+
+const REEL_LOOP = reel.loop;
+const REEL_FULL = reel.vimeoUrl;
+const REEL_POSTER = reel.poster;
 ---
 <Base title="Orges Kokoshari — 3D / VFX">
   <Header transparent />
@@ -25,7 +28,7 @@ const REEL_POSTER = '/media/site/reel-poster.jpg';
     <div class="hero-in">
       <div>
         <h1>Orges<br />Kokoshari</h1>
-        <div class="tag">Creative 3D &amp; VFX &middot; Film, episodic, advertising</div>
+        <div class="tag">{reel.tagline}</div>
       </div>
       <div>
         <button class="play" id="playReel" data-video-trigger="reel">&#9654;&nbsp; Play reel</button>
@@ -57,7 +60,7 @@ const REEL_POSTER = '/media/site/reel-poster.jpg';
     <section id="contact">
       <div class="cta">
         <div class="mono" style="margin-bottom:20px">Available for freelance and staff roles</div>
-        <a class="mail" href="mailto:kokosharstudios@gmail.com">kokosharstudios@gmail.com</a>
+        <a class="mail" href="mailto:orgesk@gmail.com">orgesk@gmail.com</a>
         <div class="slinks">
           <a href="https://www.linkedin.com/in/orgeskokoshari/">LinkedIn &nearr;</a>
           <a href="https://www.instagram.com/orges.kokoshari/">Instagram &nearr;</a>

@@ -102,7 +102,7 @@ Live in about a minute. You never see Git or a terminal.
 - **Layer 1 is always the finished piece.** Everything after peels backwards.
 - **Video layers need a poster frame.** iOS low-power mode blocks autoplay,
   so the poster is what a real share of visitors actually see.
-- **Keep Selected Work to 18-24 projects.** Beyond that your eleventh-best
+- **Keep Selected Work to 18-30 projects.** Beyond that your eleventh-best
   piece dilutes your best one.
 - **Nothing is cropped anywhere.** All media is `object-fit: contain`, so
   export at 16:9 and it fills the frame exactly.

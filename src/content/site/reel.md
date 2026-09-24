@@ -1,5 +1,5 @@
 ---
-vimeoUrl: https://player.vimeo.com/video/000000000
+vimeoUrl: https://vimeo.com/1229626725?share=copy&fl=sv&fe=ci
 loop: /media/site/reel-loop.mp4
 poster: /media/site/reel-poster.jpg
 tagline: Creative 3D & VFX · Film, episodic, advertising

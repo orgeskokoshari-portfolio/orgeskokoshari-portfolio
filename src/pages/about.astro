@@ -17,7 +17,8 @@ const disciplines = [
 ];
 
 const recognition = [
-  { title: 'Placeholder', body: 'Awards, features, talks or festival selections go here. Delete if empty — an empty section reads worse than no section.' }
+  { title: 'Godless (Netflix) — Clio Entertainment Award', body: 'Bronze, Main Title category, 2018. Contributed 3D modeling on the title sequence, produced by Method Studios.' },
+  { title: "One Piece (Netflix) — Children's & Family Emmy Recognition", body: "The series has won Children's & Family Emmy Awards and received a Visual Effects nomination, produced with Framestore." }
 ];
 
 const CATEGORIES = [
@@ -28,14 +29,42 @@ const CATEGORIES = [
 ];
 
 const credits = [
-  { title: 'Film Project 01', client: 'Studio name', role: 'FX Lead', cat: 'film', catLabel: 'Film', year: '—' },
-  { title: 'Film Project 02', client: 'Studio name', role: 'Lookdev', cat: 'film', catLabel: 'Film', year: '—' },
-  { title: 'Advertising Project 01', client: 'Agency name', role: 'CG Supervisor', cat: 'adv', catLabel: 'Advertising', year: '—' },
-  { title: 'Film Project 03', client: 'Studio name', role: 'Senior FX', cat: 'film', catLabel: 'Film', year: '—' },
-  { title: 'Advertising Project 02', client: 'Agency name', role: 'Full CG Build', cat: 'adv', catLabel: 'Advertising', year: '—' },
-  { title: 'Pilot Girl', client: 'Personal', role: 'Character Look-Dev', cat: 'personal', catLabel: 'R&D', year: '—' },
-  { title: 'Advertising Project 03', client: 'Agency name', role: 'Lighting', cat: 'adv', catLabel: 'Advertising', year: '—' },
-  { title: 'Film Project 04', client: 'Studio name', role: 'FX Artist', cat: 'film', catLabel: 'Film', year: '—' }
+  { title: 'Extraction II', client: 'Netflix', role: 'Prop & Asset Artist', cat: 'film', catLabel: 'Film', year: '2023' },
+  { title: 'No One Will Save You', client: 'Framestore', role: 'CG Generalist', cat: 'film', catLabel: 'Film', year: '2023' },
+  { title: 'The SpongeBob Movie: Search for SquarePants', client: 'House of Parliament', role: 'CG Generalist', cat: 'film', catLabel: 'Film', year: '2025' },
+  { title: 'Contraband', client: 'Method Studios', role: 'CG Generalist/Animator', cat: 'film', catLabel: 'Film', year: '2012' },
+  { title: 'FBI', client: 'FuseFx', role: 'CG Generalist', cat: 'film', catLabel: 'Film', year: '2024' },
+  { title: 'Star City', client: 'Apple TV+', role: 'Environment & Props Artist', cat: 'film', catLabel: 'Film', year: '2026' },
+  { title: 'One Piece — Season 2', client: 'Netflix', role: 'Character & Asset Artist', cat: 'film', catLabel: 'Film', year: '2026' },
+  { title: "Class of '09", client: 'Netflix', role: 'CG Generalist', cat: 'film', catLabel: 'Film', year: '2023' },
+  { title: 'Naomi', client: 'FuseFX · Netflix', role: 'Layout/Asset Creation', cat: 'film', catLabel: 'Film', year: '2022' },
+  { title: 'Godless', client: 'Method Studios · Netflix', role: '3D Modeler/Generalist', cat: 'film', catLabel: 'Film', year: '2018' },
+  { title: 'American Horror Story', client: 'Method Studios', role: 'CG Character Artist', cat: 'film', catLabel: 'Film', year: '2018' },
+
+  { title: 'Google Pixel 8', client: 'Preymaker', role: 'Lighting Artist', cat: 'adv', catLabel: 'Advertising', year: '2024' },
+  { title: 'FTX (Super Bowl, feat. Larry David)', client: 'Method Studios', role: 'Asset Creation', cat: 'adv', catLabel: 'Advertising', year: '2022' },
+  { title: 'Planters (Super Bowl, feat. Mr. Peanut)', client: 'Method Studios', role: 'CG Character/Props Artist', cat: 'adv', catLabel: 'Advertising', year: '2020' },
+  { title: 'Honda', client: 'Hornet', role: '3D Generalist', cat: 'adv', catLabel: 'Advertising', year: '2019' },
+  { title: 'Everywhere', client: 'AT&T', role: 'CG Generalist', cat: 'adv', catLabel: 'Advertising', year: '2017' },
+  { title: 'Nike', client: 'Nike', role: 'CG Generalist', cat: 'adv', catLabel: 'Advertising', year: '2021' },
+  { title: 'Samsung', client: 'Samsung', role: 'CG Generalist', cat: 'adv', catLabel: 'Advertising', year: '2020' },
+  { title: 'Ford', client: 'Ford', role: 'CG Generalist', cat: 'adv', catLabel: 'Advertising', year: '2019' },
+  { title: 'Nissan', client: 'Nissan', role: 'CG Generalist', cat: 'adv', catLabel: 'Advertising', year: '2025' },
+  { title: 'Cencora', client: 'Cencora', role: '3D Modeling/Character Artist', cat: 'adv', catLabel: 'Advertising', year: '2025' },
+  { title: 'BETMGM', client: 'BETMGM', role: 'Senior 3D Generalist', cat: 'adv', catLabel: 'Advertising', year: '2023' },
+  { title: 'Haven Life', client: 'Attaboy', role: 'Art Director', cat: 'adv', catLabel: 'Advertising', year: '2020' },
+  { title: 'Soulboost Soda', client: 'O/DD Studios', role: 'Asset Creation', cat: 'adv', catLabel: 'Advertising', year: '2026' },
+  { title: 'Tylenol', client: 'O/DD Studios', role: 'Asset Creation', cat: 'adv', catLabel: 'Advertising', year: '2025' },
+  { title: 'Shiseido', client: 'Shiseido', role: 'CG Generalist/Animator', cat: 'adv', catLabel: 'Advertising', year: '2019' },
+  { title: 'Power', client: 'Kanye West', role: 'CG Generalist', cat: 'adv', catLabel: 'Advertising', year: '2010' },
+  { title: 'God of War', client: 'Sony', role: 'Game Trailer Artist', cat: 'adv', catLabel: 'Advertising', year: '2018' },
+  { title: 'Splinter Cell: Blacklist', client: 'Xbox 360', role: 'Game Trailer Artist', cat: 'adv', catLabel: 'Advertising', year: '2013' },
+  { title: 'Coldplay', client: 'Music Video', role: 'CG Generalist/AE', cat: 'adv', catLabel: 'Advertising', year: '2008' },
+  { title: 'Kanye West', client: 'Music Video', role: 'CG Generalist', cat: 'adv', catLabel: 'Advertising', year: '2007' },
+
+  { title: 'Pilot Character', client: 'Personal', role: 'Creative', cat: 'personal', catLabel: 'R&D', year: '2024' },
+  { title: 'Cyborg Red District', client: 'Personal', role: 'Creative', cat: 'personal', catLabel: 'R&D', year: '2024' },
+  { title: 'David Bowie', client: 'Personal', role: 'Creative Work', cat: 'personal', catLabel: 'R&D', year: '2023' }
 ];
 ---
 <Base title="About — Orges Kokoshari" description="Orges Kokoshari. 3D, VFX and character look-dev for film, episodic and advertising.">
@@ -71,10 +100,6 @@ const credits = [
         <a class="dl" href={d.cv} download>Download CV <span>&darr;</span></a>
         <div class="socials">
           <a href="https://www.linkedin.com/in/orgeskokoshari/">LinkedIn &nearr;</a>
-          <a href="https://www.instagram.com/orges.kokoshari/">Instagram &nearr;</a>
-          <a href="https://www.youtube.com/@kokosharistudios-digital">YouTube &nearr;</a>
-          <a href="#">Vimeo &nearr;</a>
-          <a href="#">ArtStation &nearr;</a>
         </div>
       </aside>
 
@@ -133,17 +158,16 @@ const credits = [
     <section id="contact">
       <div class="contact">
         <div class="mono" style="margin-bottom:20px">Start here</div>
-        <a class="mail" href="mailto:kokosharstudios@gmail.com">kokosharstudios@gmail.com</a>
+        <a class="mail" href="mailto:orgesk@gmail.com">orgesk@gmail.com</a>
         <div class="cgrid">
           <div><span>Representation</span><b>&mdash;</b></div>
-          <div><span>Time zone</span><b>&mdash;</b></div>
+          <div><span>Time zone</span><b>Eastern (NYC)</b></div>
           <div><span>CV</span><a href={d.cv} download>Download PDF &darr;</a></div>
           <div><span>Elsewhere</span><a href="https://www.linkedin.com/in/orgeskokoshari/">LinkedIn &nearr;</a></div>
         </div>
       </div>
       <footer>
         <span class="mono">&copy; <span id="yr"></span> Orges Kokoshari</span>
-        <span class="mono">About page &mdash; concept v01</span>
       </footer>
     </section>
   </main>
