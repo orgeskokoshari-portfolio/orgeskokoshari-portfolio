@@ -12,6 +12,9 @@ const featured = (await getCollection('projects', ({ data }) => data.featured &&
 const reelEntry = await getEntry('reel', 'reel');
 const reel = reelEntry.data;
 
+const aboutEntry = await getEntry('about', 'about');
+const about = aboutEntry.data;
+
 const REEL_LOOP = reel.loop;
 const REEL_FULL = reel.vimeoUrl;
 const REEL_POSTER = reel.poster;
@@ -49,9 +52,9 @@ const REEL_POSTER = reel.poster;
 
     <section id="about">
       <div class="intro">
-        <p class="lede">One sentence on what you do and who you do it for.</p>
+        <p class="lede">{about.lede}</p>
         <div>
-          <p class="small">Two or three short sentences expanding on it. Keep it under sixty words — the About page carries the long version.</p>
+          <p class="small">Twenty years building CG assets end to end — sculpt through look-dev, lighting, and animation — with credits on Extraction II, One Piece, and Godless.</p>
           <a class="arrow" href="/about/">More about me &rarr;</a>
         </div>
       </div>
@@ -63,8 +66,6 @@ const REEL_POSTER = reel.poster;
         <a class="mail" href="mailto:orgesk@gmail.com">orgesk@gmail.com</a>
         <div class="slinks">
           <a href="https://www.linkedin.com/in/orgeskokoshari/">LinkedIn &nearr;</a>
-          <a href="https://www.instagram.com/orges.kokoshari/">Instagram &nearr;</a>
-          <a href="https://www.youtube.com/@kokosharistudios-digital">YouTube &nearr;</a>
           <a href="/orges-kokoshari-cv.pdf" download>CV &darr;</a>
         </div>
       </div>
