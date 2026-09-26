@@ -148,17 +148,17 @@ const GAZE: Record<string, { src: string; glance: number }> = {
 
 let active: HTMLVideoElement = gzA;
 let currentZone = 'rest';
+let transitionId = 0;
 
-function playFrom(video: HTMLVideoElement, src: string, startTime: number, loop: boolean, reveal: () => void) {
-  let done = false;
+function playFrom(video: HTMLVideoElement, src: string, startTime: number, loop: boolean, id: number, reveal: () => void) {
   const finish = () => {
-    if (done) return;
-    done = true;
+    if (id !== transitionId) return; // a newer transition superseded this one — never reveal a stale result
     video.loop = loop;
     reveal();
     video.play().catch(() => {});
   };
   const seek = () => {
+    if (id !== transitionId) return;
     try { video.currentTime = startTime; } catch {}
     const rvfc = (video as unknown as { requestVideoFrameCallback?: (cb: () => void) => void }).requestVideoFrameCallback;
     if (rvfc) rvfc.call(video, finish);
@@ -178,16 +178,17 @@ function playFrom(video: HTMLVideoElement, src: string, startTime: number, loop:
 function showZone(zone: string) {
   if (zone === currentZone) return;
   currentZone = zone;
-  const next = active === gzA ? gzB : gzA;
+  const id = ++transitionId;
+  const next = active === gzA ? gzB : gzA; // always the currently-hidden layer — `active` only flips once reveal actually fires
   const prev = active;
   const dir = GAZE[zone];
   const reveal = () => {
     next.classList.add('on');
     prev.classList.remove('on');
+    active = next;
   };
-  if (dir) playFrom(next, dir.src, dir.glance / 30, false, reveal);
-  else playFrom(next, IDLE_SRC, 0, true, reveal);
-  active = next;
+  if (dir) playFrom(next, dir.src, dir.glance / 30, false, id, reveal);
+  else playFrom(next, IDLE_SRC, 0, true, id, reveal);
 }
 
 function zoneFor(x: number, y: number, w: number, h: number) {
