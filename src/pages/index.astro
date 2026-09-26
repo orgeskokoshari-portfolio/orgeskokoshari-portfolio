@@ -41,7 +41,6 @@ const REEL_POSTER = reel.poster;
         <div class="reelmeta">Showreel</div>
       </div>
     </div>
-    <div class="cue"></div>
   </div>
 
   <main class="wrap">
@@ -93,9 +92,6 @@ const REEL_POSTER = reel.poster;
 .hero h1{font-size:clamp(30px,7.2vw,104px);font-variation-settings:"wdth" 120,"wght" 800;line-height:.86}
 .tag{font-family:var(--mono);font-size:clamp(9px,1.1vw,11px);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-top:14px}
 .reelmeta{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);margin-top:12px;text-align:right}
-.cue{position:absolute;left:50%;bottom:0;z-index:4;width:1px;height:46px;background:linear-gradient(to bottom,transparent,var(--dim))}
-@media(prefers-reduced-motion:no-preference){.cue{animation:cue 2.6s ease-in-out infinite}}
-@keyframes cue{0%,100%{opacity:.25;transform:scaleY(.6);transform-origin:bottom}50%{opacity:1;transform:scaleY(1)}}
 
 .intro{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,80px);align-items:start}
 @media(max-width:820px){.intro{grid-template-columns:1fr}}
