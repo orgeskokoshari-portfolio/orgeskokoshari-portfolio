@@ -149,19 +149,29 @@ const GAZE: Record<string, { src: string; glance: number }> = {
 let active: HTMLVideoElement = gzA;
 let currentZone = 'rest';
 
-function playFrom(video: HTMLVideoElement, src: string, startTime: number, loop: boolean) {
-  const start = () => {
-    try { video.currentTime = startTime; } catch {}
+function playFrom(video: HTMLVideoElement, src: string, startTime: number, loop: boolean, reveal: () => void) {
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
     video.loop = loop;
+    reveal();
     video.play().catch(() => {});
   };
+  const seek = () => {
+    try { video.currentTime = startTime; } catch {}
+    const rvfc = (video as unknown as { requestVideoFrameCallback?: (cb: () => void) => void }).requestVideoFrameCallback;
+    if (rvfc) rvfc.call(video, finish);
+    else video.addEventListener('seeked', finish, { once: true });
+    setTimeout(finish, 300);
+  };
   if (video.dataset.src === src) {
-    start();
+    seek();
   } else {
     video.dataset.src = src;
     video.src = src;
     video.load();
-    video.addEventListener('loadedmetadata', start, { once: true });
+    video.addEventListener('loadedmetadata', seek, { once: true });
   }
 }
 
@@ -171,10 +181,12 @@ function showZone(zone: string) {
   const next = active === gzA ? gzB : gzA;
   const prev = active;
   const dir = GAZE[zone];
-  if (dir) playFrom(next, dir.src, dir.glance / 30, false);
-  else playFrom(next, IDLE_SRC, 0, true);
-  next.classList.add('on');
-  prev.classList.remove('on');
+  const reveal = () => {
+    next.classList.add('on');
+    prev.classList.remove('on');
+  };
+  if (dir) playFrom(next, dir.src, dir.glance / 30, false, reveal);
+  else playFrom(next, IDLE_SRC, 0, true, reveal);
   active = next;
 }
 
