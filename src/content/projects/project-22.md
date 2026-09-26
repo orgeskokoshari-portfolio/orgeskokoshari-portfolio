@@ -1,5 +1,5 @@
 ---
-title: Shiseido 
+title: Macy's 
 category: advertising
 role: CG Generalist/Animator
 order: 150
@@ -9,7 +9,7 @@ thumb: project-22/thumb.jpg
 previewLoop: /media/project-22/macy_loop.mp4
 vimeoUrl: https://vimeo.com/1021933159?fl=tl&fe=ec&share=copy
 layers:
-  - label: Shiseido   
+  - label: Macy's   
     type: video
     src: /media/project-22/macy_loop.mp4
     poster: /media/project-22/poster.jpg
