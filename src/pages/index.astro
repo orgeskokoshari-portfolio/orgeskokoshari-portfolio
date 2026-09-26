@@ -191,9 +191,12 @@ function showZone(zone: string) {
   else playFrom(next, IDLE_SRC, 0, true, id, reveal);
 }
 
-function zoneFor(x: number, y: number, w: number, h: number) {
-  const col = x < w / 3 ? 0 : x < (2 * w) / 3 ? 1 : 2;
-  const row = y < h / 3 ? 0 : y < (2 * h) / 3 ? 1 : 2;
+function zoneFor(x: number, y: number, rect: DOMRect) {
+  const relX = x - rect.left;
+  const relY = y - rect.top;
+  if (relX < 0 || relY < 0 || relX > rect.width || relY > rect.height) return 'rest';
+  const col = relX < rect.width / 3 ? 0 : relX < (2 * rect.width) / 3 ? 1 : 2;
+  const row = relY < rect.height / 3 ? 0 : relY < (2 * rect.height) / 3 ? 1 : 2;
   const rows = [
     ['up_left', 'up', 'up_right'],
     ['left', 'rest', 'right'],
@@ -209,7 +212,7 @@ if (!reduce && matchMedia('(hover: hover)').matches) {
     pending = true;
     requestAnimationFrame(() => {
       pending = false;
-      showZone(zoneFor(e.clientX, e.clientY, window.innerWidth, window.innerHeight));
+      showZone(zoneFor(e.clientX, e.clientY, hero.getBoundingClientRect()));
     });
   });
   document.addEventListener('mouseleave', () => showZone('rest'));
