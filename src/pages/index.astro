@@ -146,6 +146,26 @@ let active: HTMLVideoElement = gzA;
 let currentZone = 'rest';
 let transitionId = 0;
 
+const blobUrls: Record<string, string> = {};
+const warming: Record<string, Promise<void>> = {};
+
+function warm(src: string): Promise<void> {
+  return (warming[src] ??= fetch(src)
+    .then((r) => (r.ok ? r.blob() : Promise.reject()))
+    .then((b) => { blobUrls[src] = URL.createObjectURL(b); })
+    .catch(() => {}));
+}
+
+function warmAll() {
+  const queue = [...Object.values(GAZE).map((d) => d.src), IDLE_SRC].filter((s) => !warming[s]);
+  const worker = async () => {
+    let s: string | undefined;
+    while ((s = queue.shift())) await warm(s);
+  };
+  worker();
+  worker();
+}
+
 function playFrom(video: HTMLVideoElement, src: string, startTime: number, loop: boolean, id: number, reveal: () => void) {
   const finish = () => {
     if (id !== transitionId) return; // a newer transition superseded this one — never reveal a stale result
@@ -164,10 +184,16 @@ function playFrom(video: HTMLVideoElement, src: string, startTime: number, loop:
   if (video.dataset.src === src) {
     seek();
   } else {
-    video.dataset.src = src;
-    video.src = src;
-    video.load();
-    video.addEventListener('loadedmetadata', seek, { once: true });
+    const load = () => {
+      if (id !== transitionId) return;
+      video.dataset.src = src;
+      video.src = blobUrls[src] ?? src;
+      video.load();
+      video.addEventListener('loadedmetadata', seek, { once: true });
+    };
+    // a clip already downloading is awaited rather than fetched twice; an unstarted one starts now
+    if (blobUrls[src]) load();
+    else warm(src).then(load);
   }
 }
 
@@ -213,16 +239,12 @@ if (!reduce && matchMedia('(hover: hover)').matches) {
   });
   document.addEventListener('mouseleave', () => showZone('rest'));
 
-  requestIdleCallback?.(() => {
-    Object.values(GAZE).forEach((d) => {
-      const pre = document.createElement('video');
-      pre.muted = true;
-      pre.preload = 'auto';
-      pre.style.display = 'none';
-      pre.src = d.src;
-      document.body.appendChild(pre);
-    });
-  });
+  const saveData = (navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData;
+  if (!saveData) {
+    if (!gzA.paused && gzA.readyState >= 3) warmAll();
+    else gzA.addEventListener('playing', warmAll, { once: true });
+    setTimeout(warmAll, 3000);
+  }
 }
 
 document.addEventListener('videooverlay:open', (e) => {
